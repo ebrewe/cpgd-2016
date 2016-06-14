@@ -44,7 +44,15 @@ class LevelState extends Phaser.State{
     this.renderGroup = this.game.add.group();
 
     //add player
-    this.player = this.addPlayerAt(this.game.width/2, this.game.height/2);
+    var playerDefaults = {
+      walkSpeed: 70,
+      dashSpeed: 120,
+      attack: 1,
+      defense: 0,
+      hp: 10,
+      mp: 0
+    }
+    this.player = this.addPlayer(this.game.width/2, this.game.height/2, playerDefaults);
     this.playerGroup.add(this.player);
 
     //collect groupsthis.backgroundGroup
@@ -56,20 +64,59 @@ class LevelState extends Phaser.State{
     this.renderGroup.add(this.HUDGroup);
 
   }
-  addPlayerAt(x, y){
-    var p = new Player(this.game, x, y, 'player');
+  addPlayer(x, y, settings=false){
+    var p = new Player(this.game, x, y, 'player', settings);
     return p;
   }
 }
 //========CLASSES==========//
 class Player extends Phaser.Sprite{
-  constructor(game, x, y, sprite, settings={}){
+  constructor(game, x, y, sprite, settings=false){
     super(game, x, y, sprite);
-    this.settings = settings;
+    this.settings = settings || {
+      walkSpeed: 10,
+      dashSpeed: 20,
+      attack: 1,
+      defense: 1,
+      hp:1,
+      mp: 0
+    };
 
     this.width=30;
     this.height=30;
     this.anchor.setTo(0.5);
 
+    this.cursor = this.game.input.keyboard.createCursorKeys();
+    this.game.input.keyboard.addKeyCapture(Phaser.Keyboard.CONTROL);
+    this.cursor.attack = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
+
+    this.game.physics.arcade.enable(this);
+
+
+  }
+
+  update(){
+
+    let movementVector = this.movePlayer();
+    this.body.velocity.x = movementVector[0];
+    this.body.velocity.y = movementVector[1];
+  }
+
+  movePlayer(){
+    var movementVector = [0,0]
+    if(this.cursor.left.isDown){
+       movementVector[0] = this.dashing ? -1 * this.settings.dashSpeed : -1 * this.settings.walkSpeed;
+    }
+    if(this.cursor.right.isDown){
+       movementVector[0] = this.dashing ? this.settings.dashSpeed : this.settings.walkSpeed;
+    }
+    if(this.cursor.up.isDown){
+       movementVector[1] = this.dashing ? -1 * this.settings.dashSpeed : -1 * this.settings.walkSpeed;
+    }
+    if(this.cursor.down.isDown){
+       movementVector[1] = this.dashing ? this.settings.dashSpeed : this.settings.walkSpeed;
+    }
+
+    return movementVector;
   }
 }
