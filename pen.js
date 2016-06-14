@@ -118,6 +118,7 @@ class Player extends Phaser.Sprite{
 
     this.weapons.x = this.x;
     this.weapons.y = this.y;
+    this.weapons.rotation = this.game.physics.arcade.angleToPointer(this) - 1.57;
   }
 
   movePlayer(){
@@ -160,7 +161,7 @@ class Weapon extends Phaser.Sprite{
     console.log('woosh!');
   }
   swing(){
-    this.game.add.tween(this).to({y:this.height / 2}, this.attackDuration / 2, Phaser.Easing.Linear.NONE, true, 5, 0, true )
+    this.game.add.tween(this).to({y:this.height / 2}, this.attackDuration / 2, Phaser.Easing.Linear.NONE, true, 5, 0, true);
   }
 
 }

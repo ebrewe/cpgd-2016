@@ -8,3 +8,5 @@ Also add a projectile vs melee weapon that requires ammo.
 Weapons are in a group that stays relative to the player like a childsprite. When we rotate the player, we rotate the group. Will need to add a 'facing' var to the player to update properly.
 
 weapon 'extend' added with a tween.
+
+weapon rotation by pointer. Strafing is go! we subtract 1.57 rads (90 deg) from the angle because I defaulted down.// maybe I should change that. 
