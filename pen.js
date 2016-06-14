@@ -100,7 +100,7 @@ class Player extends Phaser.Sprite{
 
     //test weapons
     this.weapons = this.game.add.group();
-    this.weapon = new Weapon(this.game, this, 0, this.height / 2, 'weapon', 1, .5);
+    this.weapon = new Weapon(this.game, this, 0, 0, 'weapon', 1, .5);
     this.weapons.add(this.weapon);
     this.weapons.add(this.reticle);
 
@@ -156,6 +156,11 @@ class Weapon extends Phaser.Sprite{
     if(this.game.time.now < this.attackTime) return false;
 
     this.attackTime = this.game.time.now + this.attackDelay + this.attackDuration;
+    this.swing();
     console.log('woosh!');
   }
+  swing(){
+    this.game.add.tween(this).to({y:this.height / 2}, this.attackDuration / 2, Phaser.Easing.Linear.NONE, true, 5, 0, true )
+  }
+
 }
