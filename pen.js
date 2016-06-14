@@ -54,6 +54,7 @@ class LevelState extends Phaser.State{
     }
     this.player = this.addPlayer(this.game.width/2, this.game.height/2, playerDefaults);
     this.playerGroup.add(this.player);
+    this.playerGroup.add(this.player.weapons);
 
     //collect groupsthis.backgroundGroup
     this.renderGroup.add(this.midgroupGroup);
@@ -92,8 +93,10 @@ class Player extends Phaser.Sprite{
 
     this.game.physics.arcade.enable(this);
 
-    //test Weapon
-    this.weapon = new Weapon(this.game, this, this.x, this.y, 'weapon', 1, .5);
+    //test weapons
+    this.weapons = this.game.add.group();
+    this.weapon = new Weapon(this.game, this, 0, 0, 'weapon', 1, .5);
+    this.weapons.add(this.weapon);
   }
 
   update(){
@@ -105,6 +108,9 @@ class Player extends Phaser.Sprite{
     if(this.game.input.activePointer.isDown || this.cursor.attack.isDown){
       this.weapon.useWeapon();
     }
+
+    this.weapons.x = this.x;
+    this.weapons.y = this.y;
   }
 
   movePlayer(){
@@ -135,11 +141,14 @@ class Weapon extends Phaser.Sprite{
      this.attack = attack;
      this.attackDelay = 1000 * speed;
      this.attackTime = 0;
+     this.anchor.setTo(0.5, 0);
+
+     this.attackDuration = 500;
   }
   useWeapon(){
     if(this.game.time.now < this.attackTime) return false;
 
-    this.attackTime = this.game.time.now + this.attackDelay;
+    this.attackTime = this.game.time.now + this.attackDelay + this.attackDuration;
     console.log('woosh!');
   }
 }
