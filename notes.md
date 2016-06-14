@@ -9,4 +9,9 @@ Weapons are in a group that stays relative to the player like a childsprite. Whe
 
 weapon 'extend' added with a tween.
 
-weapon rotation by pointer. Strafing is go! we subtract 1.57 rads (90 deg) from the angle because I defaulted down.// maybe I should change that. 
+weapon rotation by pointer. Strafing is go! we subtract 1.57 rads (90 deg) from the angle because I defaulted down.// maybe I should change that.
+*See Above* switched it to right-facing is default for ease of rotation manipulation.
+
+added a swing function
+
+added a 'using weapon' variable that locks the player rotation. No swinging in a million directions, kids! 

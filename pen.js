@@ -87,7 +87,7 @@ class Player extends Phaser.Sprite{
     this.height=30;
     this.anchor.setTo(0.5);
 
-    this.reticle = this.game.add.graphics(0, this.height);
+    this.reticle = this.game.add.graphics(this.width, 0);
     this.reticle.beginFill(0x00FF00, 1);
     this.reticle.drawCircle(0,0,5);
     this.reticle.endFill();
@@ -100,7 +100,7 @@ class Player extends Phaser.Sprite{
 
     //test weapons
     this.weapons = this.game.add.group();
-    this.weapon = new Weapon(this.game, this, 0, 0, 'weapon', 1, .5);
+    this.weapon = new Weapon(this.game, this, 0, 0, 'weapon', 1, .3);
     this.weapons.add(this.weapon);
     this.weapons.add(this.reticle);
 
@@ -118,7 +118,7 @@ class Player extends Phaser.Sprite{
 
     this.weapons.x = this.x;
     this.weapons.y = this.y;
-    this.weapons.rotation = this.game.physics.arcade.angleToPointer(this) - 1.57;
+    if(!this.weapon.usingWeapon) this.weapons.rotation = this.game.physics.arcade.angleToPointer(this);
   }
 
   movePlayer(){
@@ -149,19 +149,39 @@ class Weapon extends Phaser.Sprite{
      this.attack = attack;
      this.attackDelay = 1000 * speed;
      this.attackTime = 0;
-     this.anchor.setTo(0.5, 0);
+     this.anchor.setTo(0, 0.5);
+     this.usingWeapon = false;
 
-     this.attackDuration = 500;
+     this.attackDuration = 300;
+     this.attackRecovery = 100;
   }
   useWeapon(){
     if(this.game.time.now < this.attackTime) return false;
 
-    this.attackTime = this.game.time.now + this.attackDelay + this.attackDuration;
+    this.attackTime = this.game.time.now + this.attackDelay + this.attackDuration + this.attackRecovery;
     this.swing();
     console.log('woosh!');
   }
+  thrust(){
+    this.usingWeapon = true;
+    let t = this.game.add.tween(this).to({x:this.width / 2}, this.attackDuration, Phaser.Easing.Linear.NONE, true, 5);
+    t.onComplete.add(()=>{
+      this.game.add.tween(this).to({x:0}, this.attackRecovery, Phaser.Easing.Linear.NONE, true, 5);
+      this.usingWeapon = false;
+    });
+  }
   swing(){
-    this.game.add.tween(this).to({y:this.height / 2}, this.attackDuration / 2, Phaser.Easing.Linear.NONE, true, 5, 0, true);
+    this.usingWeapon = true;
+    let s = this.game.add.tween(this).to({rotation: 1}, 50, Phaser.Easing.Linear.NONE, true, 5 );
+    s.onComplete.add(this.arc, this)
+
+  }
+  arc(){
+    let ss = this.game.add.tween(this).to({rotation: -1}, this.attackDuration * 0.8, Phaser.Easing.Linear.NONE, true, 5 );
+    ss.onComplete.add(()=>{
+        this.game.add.tween(this).to({rotation:0}, 50, Phaser.Easing.Linear.NONE, true, 5);
+        this.usingWeapon = false;
+      });
   }
 
 }
