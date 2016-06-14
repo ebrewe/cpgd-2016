@@ -43,6 +43,10 @@ class LevelState extends Phaser.State{
     this.HUDGroup = this.game.add.group();
     this.renderGroup = this.game.add.group();
 
+    //add player
+    this.player = this.addPlayerAt(this.game.width/2, this.game.height/2);
+    this.playerGroup.add(this.player);
+
     //collect groupsthis.backgroundGroup
     this.renderGroup.add(this.midgroupGroup);
     this.renderGroup.add(this.itemsGroup);
@@ -52,6 +56,20 @@ class LevelState extends Phaser.State{
     this.renderGroup.add(this.HUDGroup);
 
   }
-
+  addPlayerAt(x, y){
+    var p = new Player(this.game, x, y, 'player');
+    return p;
+  }
 }
 //========CLASSES==========//
+class Player extends Phaser.Sprite{
+  constructor(game, x, y, sprite, settings={}){
+    super(game, x, y, sprite);
+    this.settings = settings;
+
+    this.width=30;
+    this.height=30;
+    this.anchor.setTo(0.5);
+
+  }
+}
