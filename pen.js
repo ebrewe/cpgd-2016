@@ -87,6 +87,11 @@ class Player extends Phaser.Sprite{
     this.height=30;
     this.anchor.setTo(0.5);
 
+    this.reticle = this.game.add.graphics(0, this.height);
+    this.reticle.beginFill(0x00FF00, 1);
+    this.reticle.drawCircle(0,0,5);
+    this.reticle.endFill();
+
     this.cursor = this.game.input.keyboard.createCursorKeys();
     this.game.input.keyboard.addKeyCapture(Phaser.Keyboard.CONTROL);
     this.cursor.attack = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
@@ -95,8 +100,10 @@ class Player extends Phaser.Sprite{
 
     //test weapons
     this.weapons = this.game.add.group();
-    this.weapon = new Weapon(this.game, this, 0, 0, 'weapon', 1, .5);
+    this.weapon = new Weapon(this.game, this, 0, this.height / 2, 'weapon', 1, .5);
     this.weapons.add(this.weapon);
+    this.weapons.add(this.reticle);
+
   }
 
   update(){
