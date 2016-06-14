@@ -65,7 +65,7 @@ class LevelState extends Phaser.State{
 
   }
   addPlayer(x, y, settings=false){
-    var p = new Player(this.game, x, y, 'player', settings);
+    let p = new Player(this.game, x, y, 'player', settings);
     return p;
   }
 }
@@ -92,7 +92,8 @@ class Player extends Phaser.Sprite{
 
     this.game.physics.arcade.enable(this);
 
-
+    //test Weapon
+    this.weapon = new Weapon(this.game, this, this.x, this.y, 'weapon', 1, .5);
   }
 
   update(){
@@ -100,6 +101,10 @@ class Player extends Phaser.Sprite{
     let movementVector = this.movePlayer();
     this.body.velocity.x = movementVector[0];
     this.body.velocity.y = movementVector[1];
+
+    if(this.game.input.activePointer.isDown || this.cursor.attack.isDown){
+      this.weapon.useWeapon();
+    }
   }
 
   movePlayer(){
@@ -118,5 +123,23 @@ class Player extends Phaser.Sprite{
     }
 
     return movementVector;
+  }
+}
+
+
+/*/----WEAPONS --------------/*/
+class Weapon extends Phaser.Sprite{
+  constructor(game, player, x,y,sprite,attack,speed){
+     super(game, x, y, sprite);
+     this.player = player;
+     this.attack = attack;
+     this.attackDelay = 1000 * speed;
+     this.attackTime = 0;
+  }
+  useWeapon(){
+    if(this.game.time.now < this.attackTime) return false;
+
+    this.attackTime = this.game.time.now + this.attackDelay;
+    console.log('woosh!');
   }
 }
