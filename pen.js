@@ -166,12 +166,16 @@ class Player extends Phaser.Sprite{
 
   rotatePlayer(angle){
     var cr = this.weapons.rotation;
-    if(angle > cr ){
-      if(angle - cr <= .1) return angle;
-      return cr + .1;
-    }
-    if(cr - angle <= .1) return angle;
-      return cr - .1;
+    var direction;
+    if(cr > 0 && angle > 0) direction = angle > cr ? 1 : -1;
+    if(cr < 0 && angle < 0) direction = angle < cr ? -1 : 1;
+    if(cr >= 0 && angle < 0) direction = Math.abs(angle) > cr ? 1 : -1;
+    if(cr < 0 && angle >= 0) direction = angle < Math.abs(cr) ? 1 : -1; 
+
+    let diff = Math.abs(angle) - Math.abs(cr);
+    let signEq = Math.sign(angle) === Math.sign(cr);
+    if(Math.abs(diff) <= .1) return angle;
+    return cr + (direction * 0.1);
   }
   movePlayer(){
     var movementVector = [0,0]

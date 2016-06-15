@@ -23,4 +23,4 @@ added rudimentary left-click only for attacking. Not a fan of the way phaser dis
 
 Changing player speed based on direction faced. moving back is safest, slowest. 
 
-added rudimentary rotation lerp.
+added rudimentary rotation lerp. //in the future, check to see which direction is fastest -- maybe convert to deg and then back? 
