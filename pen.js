@@ -145,6 +145,8 @@ class Player extends Phaser.Sprite{
 class Weapon extends Phaser.Sprite{
   constructor(game, player, x,y,sprite,attack,speed){
      super(game, x, y, sprite);
+     this.defaultX = x;
+     this.defaultY = y;
      this.player = player;
      this.attack = attack;
      this.attackDelay = 1000 * speed;
@@ -172,14 +174,14 @@ class Weapon extends Phaser.Sprite{
   }
   swing(){
     this.usingWeapon = true;
-    let s = this.game.add.tween(this).to({rotation: 1}, 50, Phaser.Easing.Linear.NONE, true, 5 );
+    let s = this.game.add.tween(this).to({rotation: 1, x:this.width/3, y:this.width/2}, 50, Phaser.Easing.Linear.NONE, true, 5 );
     s.onComplete.add(this.arc, this)
 
   }
   arc(){
-    let ss = this.game.add.tween(this).to({rotation: -1}, this.attackDuration * 0.8, Phaser.Easing.Linear.NONE, true, 5 );
+    let ss = this.game.add.tween(this).to({rotation: -1.1, x:this.width * 0.8, y:-(this.width/3)}, this.attackDuration * 0.8, Phaser.Easing.Linear.NONE, true, 5 );
     ss.onComplete.add(()=>{
-        this.game.add.tween(this).to({rotation:0}, 50, Phaser.Easing.Linear.NONE, true, 5);
+        this.game.add.tween(this).to({rotation:0, x:this.defaultX, y:this.defaultY}, 50, Phaser.Easing.Linear.NONE, true, 5);
         this.usingWeapon = false;
       });
   }

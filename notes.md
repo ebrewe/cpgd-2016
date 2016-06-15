@@ -14,4 +14,5 @@ weapon rotation by pointer. Strafing is go! we subtract 1.57 rads (90 deg) from 
 
 added a swing function
 
-added a 'using weapon' variable that locks the player rotation. No swinging in a million directions, kids! 
+added a 'using weapon' variable that locks the player rotation. No swinging in a million directions, kids!
+I'll have to put variables in for the swing limits.
