@@ -151,10 +151,13 @@ class Weapon extends Phaser.Sprite{
      this.attack = attack;
      this.attackDelay = 1000 * speed;
      this.attackTime = 0;
-     this.anchor.setTo(0, 0.5);
+     this.anchor.setTo(0.2, 0.5);
      this.usingWeapon = false;
 
-     this.attackDuration = 300;
+     this.width = 30;
+     this.height = 15;
+
+     this.attackDuration = 200;
      this.attackRecovery = 100;
   }
   useWeapon(){
@@ -174,12 +177,12 @@ class Weapon extends Phaser.Sprite{
   }
   swing(){
     this.usingWeapon = true;
-    let s = this.game.add.tween(this).to({rotation: 1, x:this.width/3, y:this.width/2}, 50, Phaser.Easing.Linear.NONE, true, 5 );
+    let s = this.game.add.tween(this).to({rotation: 1.2, x:this.width/3, y:this.width/2}, 100, Phaser.Easing.Linear.NONE, true, 5 );
     s.onComplete.add(this.arc, this)
 
   }
   arc(){
-    let ss = this.game.add.tween(this).to({rotation: -1.1, x:this.width * 0.8, y:-(this.width/3)}, this.attackDuration * 0.8, Phaser.Easing.Linear.NONE, true, 5 );
+    let ss = this.game.add.tween(this).to({rotation: -0.6, x:this.width * 0.8, y:-(this.width/3)}, this.attackDuration * 0.8, Phaser.Easing.Linear.NONE, true, 5 );
     ss.onComplete.add(()=>{
         this.game.add.tween(this).to({rotation:0, x:this.defaultX, y:this.defaultY}, 50, Phaser.Easing.Linear.NONE, true, 5);
         this.usingWeapon = false;
