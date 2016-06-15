@@ -146,8 +146,8 @@ class Player extends Phaser.Sprite{
     this.weapons.x = this.x;
     this.weapons.y = this.y;
     let angleToPointer = this.game.physics.arcade.angleToPointer(this);
-    if(!this.weapon.usingWeapon) this.weapons.rotation = angleToPointer;
-    console.log(angleToPointer)
+    if(!this.weapon.usingWeapon) this.weapons.rotation = this.rotatePlayer(angleToPointer);
+    
   }
 
   getAngleDirection(angle){
@@ -164,6 +164,15 @@ class Player extends Phaser.Sprite{
     }
   }
 
+  rotatePlayer(angle){
+    var cr = this.weapons.rotation;
+    if(angle > cr ){
+      if(angle - cr <= .1) return angle;
+      return cr + .1;
+    }
+    if(cr - angle <= .1) return angle;
+      return cr - .1;
+  }
   movePlayer(){
     var movementVector = [0,0]
     if(this.cursor.left.isDown){
