@@ -117,12 +117,14 @@ class Player extends Phaser.Sprite{
         this.weapon.useWeapon(c);
       }
     });
-    console.log(this.game.input.activePointer.onUpCallback)
-    this.game.input.activePointer.onUpCallback = ((e)=>{
+
+    document.addEventListener('mouseup', (e)=>{
+      if(e.which === 1){
         let c= this.game.time.now - this.chargeTime;
         this.charging = false;
         this.chargeTime = 0;
         this.weapon.useWeapon(c);
+      }
     });
 
   }
@@ -134,9 +136,10 @@ class Player extends Phaser.Sprite{
     this.body.velocity.y = movementVector[1];
 
     if(this.cursor.attack.isDown || this.game.input.activePointer.isDown){
-      if(this.charging) return;
-      this.charging = true;
-      this.chargeTime = this.game.time.now;
+      if(!this.charging){
+        this.charging = true;
+        this.chargeTime = this.game.time.now;
+      }
     }
 
 

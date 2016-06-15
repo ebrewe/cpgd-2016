@@ -17,4 +17,6 @@ added a swing function
 added a 'using weapon' variable that locks the player rotation. No swinging in a million directions, kids!
 I'll have to put variables in for the swing limits.
 
-should put in rotation lerping rather than instant turn. 
+should put in rotation lerping rather than instant turn.
+
+added rudimentary left-click only for attacking. Not a fan of the way phaser distinguishes mouse buttons. 
