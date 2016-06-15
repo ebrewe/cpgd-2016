@@ -145,9 +145,24 @@ class Player extends Phaser.Sprite{
 
     this.weapons.x = this.x;
     this.weapons.y = this.y;
-    if(!this.weapon.usingWeapon) this.weapons.rotation = this.game.physics.arcade.angleToPointer(this);
+    let angleToPointer = this.game.physics.arcade.angleToPointer(this);
+    if(!this.weapon.usingWeapon) this.weapons.rotation = angleToPointer;
+    console.log(angleToPointer)
   }
 
+  getAngleDirection(angle){
+    //from top
+    var directions = {
+      top: -1.6,
+      topRight: -0.75,
+      right: 0,
+      bottomRight:0.75,
+      bottom:1.5,
+      bottomLeft:2.4,
+      left: -3,
+      topLeft: -2.4
+    }
+  }
 
   movePlayer(){
     var movementVector = [0,0]
@@ -195,10 +210,11 @@ class Weapon extends Phaser.Sprite{
   useWeapon(charge = 0){
     if(this.game.time.now < this.attackTime) return false;
 
-    this.attackTime = this.game.time.now + this.attackDelay + this.attackDuration + this.attackRecovery;
     if(charge >= this.chargeTimes.swing){
+        this.attackTime = this.game.time.now + this.attackDelay + this.attackDuration + this.attackRecovery;
       this.swing();
     }else{
+        this.attackTime = this.game.time.now + 100 + this.attackDuration + this.attackRecovery;
       this.thrust();
     }
   }
@@ -224,4 +240,12 @@ class Weapon extends Phaser.Sprite{
       });
   }
 
+}
+
+class Shield extends Phaser.Sprite{
+  constructor(game, player, x, y){
+    super(game, x, y, '');
+    this.player = player;
+    this.game.physics.arcade.enable(this);
+  }
 }

@@ -19,4 +19,6 @@ I'll have to put variables in for the swing limits.
 
 should put in rotation lerping rather than instant turn.
 
-added rudimentary left-click only for attacking. Not a fan of the way phaser distinguishes mouse buttons. 
+added rudimentary left-click only for attacking. Not a fan of the way phaser distinguishes mouse buttons.
+
+Changing player speed based on direction faced. moving back is safest, slowest. 
