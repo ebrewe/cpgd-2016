@@ -92,6 +92,9 @@ class Player extends Phaser.Sprite{
     this.reticle.drawCircle(0,0,5);
     this.reticle.endFill();
 
+    this.charging = false;
+    this.chargeTime = 0;
+
     this.cursor = this.game.input.keyboard.createCursorKeys();
     this.game.input.keyboard.addKeyCapture(Phaser.Keyboard.CONTROL);
     this.cursor.attack = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
@@ -104,6 +107,24 @@ class Player extends Phaser.Sprite{
     this.weapons.add(this.weapon);
     this.weapons.add(this.reticle);
 
+    //callbacks
+    this.game.input.keyboard.onUpCallback = ((e)=>{
+      let key = e.keyCode;
+      if(key == this.cursor.attack.keyCode){
+        let c= this.game.time.now - this.chargeTime;
+        this.charging = false;
+        this.chargeTime = 0;
+        this.weapon.useWeapon(c);
+      }
+    });
+    console.log(this.game.input.activePointer.onUpCallback)
+    this.game.input.activePointer.onUpCallback = ((e)=>{
+        let c= this.game.time.now - this.chargeTime;
+        this.charging = false;
+        this.chargeTime = 0;
+        this.weapon.useWeapon(c);
+    });
+
   }
 
   update(){
@@ -112,14 +133,18 @@ class Player extends Phaser.Sprite{
     this.body.velocity.x = movementVector[0];
     this.body.velocity.y = movementVector[1];
 
-    if(this.game.input.activePointer.isDown || this.cursor.attack.isDown){
-      this.weapon.useWeapon();
+    if(this.cursor.attack.isDown || this.game.input.activePointer.isDown){
+      if(this.charging) return;
+      this.charging = true;
+      this.chargeTime = this.game.time.now;
     }
+
 
     this.weapons.x = this.x;
     this.weapons.y = this.y;
     if(!this.weapon.usingWeapon) this.weapons.rotation = this.game.physics.arcade.angleToPointer(this);
   }
+
 
   movePlayer(){
     var movementVector = [0,0]
@@ -151,21 +176,28 @@ class Weapon extends Phaser.Sprite{
      this.attack = attack;
      this.attackDelay = 1000 * speed;
      this.attackTime = 0;
-     this.anchor.setTo(0.2, 0.5);
+     this.anchor.setTo(0.2, 0.1);
      this.usingWeapon = false;
 
      this.width = 30;
      this.height = 15;
 
+     this.chargeTimes = {
+       'swing':400
+     }
+
      this.attackDuration = 200;
      this.attackRecovery = 100;
   }
-  useWeapon(){
+  useWeapon(charge = 0){
     if(this.game.time.now < this.attackTime) return false;
 
     this.attackTime = this.game.time.now + this.attackDelay + this.attackDuration + this.attackRecovery;
-    this.swing();
-    console.log('woosh!');
+    if(charge >= this.chargeTimes.swing){
+      this.swing();
+    }else{
+      this.thrust();
+    }
   }
   thrust(){
     this.usingWeapon = true;
@@ -177,12 +209,12 @@ class Weapon extends Phaser.Sprite{
   }
   swing(){
     this.usingWeapon = true;
-    let s = this.game.add.tween(this).to({rotation: 1.2, x:this.width/3, y:this.width/2}, 100, Phaser.Easing.Linear.NONE, true, 5 );
+    let s = this.game.add.tween(this).to({rotation: 1.4, x:this.width/3, y:this.width/2}, 100, Phaser.Easing.Linear.NONE, true, 5 );
     s.onComplete.add(this.arc, this)
 
   }
   arc(){
-    let ss = this.game.add.tween(this).to({rotation: -0.6, x:this.width * 0.8, y:-(this.width/3)}, this.attackDuration * 0.8, Phaser.Easing.Linear.NONE, true, 5 );
+    let ss = this.game.add.tween(this).to({rotation: -0.1, x:this.width * 0.8, y:-(this.width/3)}, this.attackDuration * 0.8, Phaser.Easing.Linear.NONE, true, 5 );
     ss.onComplete.add(()=>{
         this.game.add.tween(this).to({rotation:0, x:this.defaultX, y:this.defaultY}, 50, Phaser.Easing.Linear.NONE, true, 5);
         this.usingWeapon = false;
