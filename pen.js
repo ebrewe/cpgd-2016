@@ -39,6 +39,7 @@ class LevelState extends Phaser.State{
     this.itemsGroup = this.game.add.group();
     this.entitiesGroup = this.game.add.group();
     this.playerGroup = this.game.add.group();
+    this.projectilesGroup = this.game.add.group();
     this.effectsGroup = this.game.add.group();
     this.HUDGroup = this.game.add.group();
     this.renderGroup = this.game.add.group();
@@ -56,11 +57,15 @@ class LevelState extends Phaser.State{
     this.playerGroup.add(this.player);
     this.playerGroup.add(this.player.weapons);
 
+    var testP = new Projectile(this.game, Math.random() * this.game.width, Math.random() * this.game.height, 'fireball', {x:this.player.x, y:this.player.y})
+    this.projectilesGroup.add(testP);
+
     //collect groupsthis.backgroundGroup
     this.renderGroup.add(this.midgroupGroup);
     this.renderGroup.add(this.itemsGroup);
     this.renderGroup.add(this.entitiesGroup);
     this.renderGroup.add(this.playerGroup);
+    this.renderGroup.add(this.projectilesGroup);
     this.renderGroup.add(this.effectsGroup);
     this.renderGroup.add(this.HUDGroup);
 
@@ -70,9 +75,18 @@ class LevelState extends Phaser.State{
     return p;
   }
   update(){
-
+    this.doCollisions();
     //camera
     this.camera.focusOnXY(this.player.x, this.player.y);
+  }
+  doCollisions(){
+    this.game.physics.arcade.collide(this.player.shield, this.projectilesGroup, (shield, projectile)=>{
+      projectile.kill();
+    }, null);
+    this.game.physics.arcade.collide(this.player, this.projectilesGroup, (player, projectile)=>{
+      projectile.kill();
+      console.log('ouch!')
+    }, null)
   }
 }
 //========CLASSES==========//
@@ -246,6 +260,9 @@ class Weapon extends Phaser.Sprite{
      this.height = 8;
      this.swingWidth = 15;
 
+     this.game.physics.arcade.enable(this);
+     this.body.immovable = true;
+
      this.chargeTimes = {
        'swing':400
      }
@@ -298,5 +315,23 @@ class Shield extends Phaser.Sprite{
     this.anchor.setTo(0.4, 0.6);
 
     this.game.physics.arcade.enable(this);
+    this.body.immovable = true;
+  }
+}
+
+class Projectile extends Phaser.Sprite{
+  constructor(game, x, y, sprite, target={x:0, y:0}){
+    super(game, x, y, sprite);
+
+    this.width = 5;
+    this.height = 5;
+    this.game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
+
+    this.seeking = false;
+    this.game.physics.arcade.moveToXY(this, target.x, target.y)
+  }
+  update(){
+
   }
 }
