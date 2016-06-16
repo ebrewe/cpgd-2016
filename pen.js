@@ -69,6 +69,11 @@ class LevelState extends Phaser.State{
     let p = new Player(this.game, x, y, 'player', settings);
     return p;
   }
+  update(){
+
+    //camera
+    this.camera.focusOnXY(this.player.x, this.player.y);
+  }
 }
 //========CLASSES==========//
 class Player extends Phaser.Sprite{
@@ -83,8 +88,8 @@ class Player extends Phaser.Sprite{
       mp: 0
     };
 
-    this.width=30;
-    this.height=30;
+    this.width=15;
+    this.height=15;
     this.anchor.setTo(0.5);
 
     this.reticle = this.game.add.graphics(this.width, 0);
@@ -131,9 +136,14 @@ class Player extends Phaser.Sprite{
 
   update(){
 
-    let movementVector = this.movePlayer();
-    this.body.velocity.x = movementVector[0];
-    this.body.velocity.y = movementVector[1];
+    this.movementVector = this.movePlayer();
+
+    let angleToPointer = this.game.physics.arcade.angleToPointer(this);
+    if(!this.weapon.usingWeapon) this.weapons.rotation = this.rotatePlayer(angleToPointer);
+    let moveSpeed = this.getAngleDirection(angleToPointer) ? 1 : 0.7;
+
+    this.body.velocity.x = this.movementVector[0] * this.settings.walkSpeed * moveSpeed;
+    this.body.velocity.y = this.movementVector[1] * this.settings.walkSpeed * moveSpeed;
 
     if(this.cursor.attack.isDown || this.game.input.activePointer.isDown){
       if(!this.charging){
@@ -145,25 +155,42 @@ class Player extends Phaser.Sprite{
 
     this.weapons.x = this.x;
     this.weapons.y = this.y;
-    let angleToPointer = this.game.physics.arcade.angleToPointer(this);
-    if(!this.weapon.usingWeapon) this.weapons.rotation = this.rotatePlayer(angleToPointer);
-
   }
 
   getAngleDirection(angle){
     //from top
-    var directions = {
-      top: -1.6,
-      topRight: -0.75,
-      right: 0,
-      bottomRight:0.75,
-      bottom:1.5,
-      bottomLeft:2.4,
-      left: -3,
-      topLeft: -2.4
+    const directions = {
+      "negativeLeft": -3.1,
+      "upLeft": -2.4,
+      "up": -1.6,
+      "upRight": -0.75,
+      "right": 0,
+      "downRight":0.75,
+      "down":1.5,
+      "downLeft":2.4,
+      "left": 3.1
     }
+    let ad = "left";
+    for(var i in directions){
+      if(angle < directions[i] + 0.2){
+        ad = i;
+        break;
+      }
+    }
+    if(ad == "negativeLeft") ad = "left"
+    let vector = this.translateMovementVector();
+    return (ad == vector);
   }
+  translateMovementVector(){
+      if(!this.movementVector) return false;
+      var v = "";
+      if(this.movementVector[1] > 0) v += "down";
+      if(this.movementVector[1] < 0) v += "up";
+      if(this.movementVector[0] < 0) v = v.length? v + "Left" : "left";
+      if(this.movementVector[0] > 0) v = v.length? v + "Right" : "right";
+      return v.length ? v : false;
 
+  }
   rotatePlayer(angle){
     var cr = this.weapons.rotation;
     var direction;
@@ -180,16 +207,16 @@ class Player extends Phaser.Sprite{
   movePlayer(){
     var movementVector = [0,0]
     if(this.cursor.left.isDown){
-       movementVector[0] = this.dashing ? -1 * this.settings.dashSpeed : -1 * this.settings.walkSpeed;
+       movementVector[0] = -1;
     }
     if(this.cursor.right.isDown){
-       movementVector[0] = this.dashing ? this.settings.dashSpeed : this.settings.walkSpeed;
+       movementVector[0] = 1;
     }
     if(this.cursor.up.isDown){
-       movementVector[1] = this.dashing ? -1 * this.settings.dashSpeed : -1 * this.settings.walkSpeed;
+       movementVector[1] = -1;
     }
     if(this.cursor.down.isDown){
-       movementVector[1] = this.dashing ? this.settings.dashSpeed : this.settings.walkSpeed;
+       movementVector[1] = 1;
     }
 
     return movementVector;
@@ -207,13 +234,13 @@ class Weapon extends Phaser.Sprite{
      this.attack = attack;
      this.attackDelay = 1000 * speed;
      this.attackTime = 0;
-     this.anchor.setTo(0.2, 0.1);
+     this.anchor.setTo(0, 0);
      this.usingWeapon = false;
 
-     this.defaultWidth = 10;
+     this.defaultWidth = 5;
      this.width = this.defaultWidth;
-     this.height = 15;
-     this.swingWidth = 30;
+     this.height = 8;
+     this.swingWidth = 15;
 
      this.chargeTimes = {
        'swing':400
@@ -248,7 +275,7 @@ class Weapon extends Phaser.Sprite{
 
   }
   arc(){
-    let ss = this.game.add.tween(this).to({rotation: -0.1, x:this.swingWidth * 0.8, y:-(this.swingWidth/3), width:this.swingWidth}, this.attackDuration * 0.8, Phaser.Easing.Linear.NONE, true, 5 );
+    let ss = this.game.add.tween(this).to({rotation: -0.3, x:this.swingWidth * 0.8, y:-(this.swingWidth/3), width:this.swingWidth}, this.attackDuration * 0.8, Phaser.Easing.Linear.NONE, true, 5 );
     ss.onComplete.add(()=>{
         this.game.add.tween(this).to({rotation:0, x:this.defaultX, y:this.defaultY, width:this.defaultWidth}, 50, Phaser.Easing.Linear.NONE, true, 5);
         this.usingWeapon = false;
