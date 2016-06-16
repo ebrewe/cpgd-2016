@@ -108,12 +108,12 @@ class Player extends Phaser.Sprite{
 
     //test weapons
     this.weapons = this.game.add.group();
-    this.weapon = new Weapon(this.game, this, 0, 0, 'weapon', 1, .3);
+    this.weapon = new Weapon(this.game, this, 0, 5, 'weapon', 1, .3);
     this.weapons.add(this.weapon);
     this.weapons.add(this.reticle);
 
     //test Shield
-    this.shield = new Shield(this.game, this, this.width/2, 0);
+    this.shield = new Shield(this.game, this, this.width*0.8, 0);
     this.weapons.add(this.shield);
 
     //callbacks
