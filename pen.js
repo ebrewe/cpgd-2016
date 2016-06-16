@@ -112,6 +112,10 @@ class Player extends Phaser.Sprite{
     this.weapons.add(this.weapon);
     this.weapons.add(this.reticle);
 
+    //test Shield
+    this.shield = new Shield(this.game, this, this.width/2, 0);
+    this.weapons.add(this.shield);
+
     //callbacks
     this.game.input.keyboard.onUpCallback = ((e)=>{
       let key = e.keyCode;
@@ -286,8 +290,13 @@ class Weapon extends Phaser.Sprite{
 
 class Shield extends Phaser.Sprite{
   constructor(game, player, x, y){
-    super(game, x, y, '');
+    super(game, x, y, 'shield');
     this.player = player;
+
+    this.width = 5;
+    this.height = 18;
+    this.anchor.setTo(0.4, 0.6);
+
     this.game.physics.arcade.enable(this);
   }
 }

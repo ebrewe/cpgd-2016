@@ -27,4 +27,6 @@ added rudimentary rotation lerp. //in the future, check to see which direction i
 
 shrunk the player.
 
-added faster movement when going forward. 
+added faster movement when going forward.
+
+Added shield. need to move it on attack.
