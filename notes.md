@@ -30,3 +30,5 @@ shrunk the player.
 added faster movement when going forward.
 
 Added shield. need to move it on attack.
+
+added fireballs for demo that bounce off shield or make you say "ouch!"

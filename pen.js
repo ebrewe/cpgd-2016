@@ -40,9 +40,12 @@ class LevelState extends Phaser.State{
     this.entitiesGroup = this.game.add.group();
     this.playerGroup = this.game.add.group();
     this.projectilesGroup = this.game.add.group();
+    this.fireballs = this.game.add.group();
     this.effectsGroup = this.game.add.group();
     this.HUDGroup = this.game.add.group();
     this.renderGroup = this.game.add.group();
+
+    this.fireballTimer = this.game.time.now + 2000;
 
     //add player
     var playerDefaults = {
@@ -57,8 +60,12 @@ class LevelState extends Phaser.State{
     this.playerGroup.add(this.player);
     this.playerGroup.add(this.player.weapons);
 
-    var testP = new Projectile(this.game, Math.random() * this.game.width, Math.random() * this.game.height, 'fireball', {x:this.player.x, y:this.player.y})
-    this.projectilesGroup.add(testP);
+    for(let i of Array(20).keys()){
+      var testP = new Projectile(this.game, Math.random() * this.game.width, Math.random() * this.game.height, 'fireball', {x:this.player.x, y:this.player.y});
+      testP.kill();
+      this.fireballs.add(testP);
+    }
+
 
     //collect groupsthis.backgroundGroup
     this.renderGroup.add(this.midgroupGroup);
@@ -66,6 +73,7 @@ class LevelState extends Phaser.State{
     this.renderGroup.add(this.entitiesGroup);
     this.renderGroup.add(this.playerGroup);
     this.renderGroup.add(this.projectilesGroup);
+    this.renderGroup.add(this.fireballs); //demo
     this.renderGroup.add(this.effectsGroup);
     this.renderGroup.add(this.HUDGroup);
 
@@ -76,14 +84,23 @@ class LevelState extends Phaser.State{
   }
   update(){
     this.doCollisions();
+    if(this.game.time.now > this.fireballTimer) this.launchFireball();
     //camera
     this.camera.focusOnXY(this.player.x, this.player.y);
   }
+  launchFireball(){
+    this.fireballTimer = this.game.time.now + 3000;
+    let f = this.fireballs.getFirstExists(false);
+    f.target = {x:this.player.x, y:this.player.y};
+    f.killOn = this.game.time.now + 5000;
+    f.reset(Math.random() * this.game.width, Math.random() * this.game.height);
+    f.launchStraight();
+  }
   doCollisions(){
-    this.game.physics.arcade.collide(this.player.shield, this.projectilesGroup, (shield, projectile)=>{
+    this.game.physics.arcade.collide(this.player.shield, this.fireballs, (shield, projectile)=>{
       projectile.kill();
     }, null);
-    this.game.physics.arcade.collide(this.player, this.projectilesGroup, (player, projectile)=>{
+    this.game.physics.arcade.collide(this.player, this.fireballs, (player, projectile)=>{
       projectile.kill();
       console.log('ouch!')
     }, null)
@@ -320,7 +337,7 @@ class Shield extends Phaser.Sprite{
 }
 
 class Projectile extends Phaser.Sprite{
-  constructor(game, x, y, sprite, target={x:0, y:0}){
+  constructor(game, x, y, sprite, target={x:0, y:0}, speed=200){
     super(game, x, y, sprite);
 
     this.width = 5;
@@ -328,10 +345,15 @@ class Projectile extends Phaser.Sprite{
     this.game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
 
+    this.target = target;
+    this.speed = speed;
+    this.killOn = 0;
     this.seeking = false;
-    this.game.physics.arcade.moveToXY(this, target.x, target.y)
+  }
+  launchStraight(){
+    this.game.physics.arcade.moveToXY(this, this.target.x, this.target.y, this.speed)
   }
   update(){
-
+    if(this.alive && this.game.time.now > this.killOn) this.kill();
   }
 }
