@@ -32,3 +32,7 @@ added faster movement when going forward.
 Added shield. need to move it on attack.
 
 added fireballs for demo that bounce off shield or make you say "ouch!"
+
+need to add 'active' state to weapon and shield so they don't interact when they aren't supposed to.
+
+move shield on attack. 

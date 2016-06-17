@@ -187,6 +187,12 @@ class Player extends Phaser.Sprite{
       }
     }
 
+    if(this.weapon.usingWeapon && !this.shield.usingWeapon){
+      this.shield.beAggressive();
+    }
+    if(!this.weapon.usingWeapon && this.shield.usingWeapon){
+      this.shield.beDefensive();
+    }
 
     this.weapons.x = this.x;
     this.weapons.y = this.y;
@@ -280,6 +286,8 @@ class Weapon extends Phaser.Sprite{
      this.game.physics.arcade.enable(this);
      this.body.immovable = true;
 
+     this.usingWeapon = false;
+
      this.chargeTimes = {
        'swing':400
      }
@@ -290,6 +298,7 @@ class Weapon extends Phaser.Sprite{
   useWeapon(charge = 0){
     if(this.game.time.now < this.attackTime) return false;
 
+    this.usingWeapon = true;
     if(charge >= this.chargeTimes.swing){
         this.attackTime = this.game.time.now + this.attackDelay + this.attackDuration + this.attackRecovery;
       this.swing();
@@ -299,7 +308,6 @@ class Weapon extends Phaser.Sprite{
     }
   }
   thrust(){
-    this.usingWeapon = true;
     let t = this.game.add.tween(this).to({x:this.swingWidth / 2, width:this.swingWidth}, this.attackDuration, Phaser.Easing.Linear.NONE, true, 5);
     t.onComplete.add(()=>{
       this.game.add.tween(this).to({x:0, width:this.defaultWidth}, this.attackRecovery, Phaser.Easing.Linear.NONE, true, 5);
@@ -307,7 +315,6 @@ class Weapon extends Phaser.Sprite{
     });
   }
   swing(){
-    this.usingWeapon = true;
     let s = this.game.add.tween(this).to({rotation: 1.4, x:this.swingWidth/3, y:this.swingWidth/2, width:this.swingWidth}, 100, Phaser.Easing.Linear.NONE, true, 5 );
     s.onComplete.add(this.arc, this)
 
@@ -327,12 +334,25 @@ class Shield extends Phaser.Sprite{
     super(game, x, y, 'shield');
     this.player = player;
 
+    this.defaultX = x;
+    this.defaultY = y;
+
     this.width = 5;
     this.height = 18;
     this.anchor.setTo(0.4, 0.6);
 
+    this.usingWeapon = false;
+
     this.game.physics.arcade.enable(this);
     this.body.immovable = true;
+  }
+  beAggressive(){
+    this.usingWeapon = true;
+    this.game.add.tween(this).to({rotation:-1, y:this.defaultY - 7, x:this.defaultX - 7}, 100, Phaser.Easing.Linear.NONE, true, 5);
+  }
+  beDefensive(){
+    this.usingWeapon=false;
+    this.game.add.tween(this).to({rotation:0, y:this.defaultY, x:this.defaultX}, 50, Phaser.Easing.Linear.NONE, true, 5);
   }
 }
 
